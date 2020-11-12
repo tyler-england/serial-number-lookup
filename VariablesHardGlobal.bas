@@ -90,7 +90,7 @@ Function ExportModules() As Boolean
         sSubFolder = sFolderPath & "VBA_Modules"
     End If
     sFolderPath = sFolderPath & sSubFolder & "\" 'vba modules folder
-    sFileFolder = Replace(Replace(Replace(ThisWorkbook.Path & "\" & ThisWorkbook.Name, "\", "-"), ".", ""), ":", "+")
+    sFileFolder = Replace(Replace(Replace(Replace(Replace(ThisWorkbook.Path & "\" & ThisWorkbook.Name, "\", "-"), ".", ""), ":", "+"), " ", ""), "/", "-")
     sSubFolder = Dir(sFolderPath & sFileFolder, vbDirectory)
     If sSubFolder = "" Then 'folder doesn't exist
         bNewFolder = True

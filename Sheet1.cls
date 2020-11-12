@@ -14,7 +14,6 @@ Private Sub Worksheet_Activate()
 End Sub
 
 Private Sub Worksheet_Change(ByVal Target As Range)
-    
     On Error GoTo errhandler
     
     If Not bDuringChange Then

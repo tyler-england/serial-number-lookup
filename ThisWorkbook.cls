@@ -13,6 +13,7 @@ End Sub
 
 
 Private Sub Workbook_Open()
+    ThisWorkbook.AutoSaveOn = False
     On Error Resume Next
     Application.DisplayAlerts = False
     Sheet1.Visible = xlSheetVisible

@@ -65,9 +65,6 @@ Function SearchVault(sSearchInp As String, Optional sExtPatt As String) As Strin
             End If
         Loop
         If i < 15 And Not eResult Is Nothing Then sOutput = eResult.Path
-        Debug.Print eResult.StateName
-        Debug.Print eResult.FileDate
-        Debug.Print eResult.LockedByUserName
         
     End If
     SearchVault = sOutput

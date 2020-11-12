@@ -1,4 +1,5 @@
 Attribute VB_Name = "WhenOpen"
+Public sApp As String
 Option Explicit
 
 '''''for NumLock'''''''
@@ -54,6 +55,7 @@ Type POINTAPI
 End Type
 
 Sub RecurOpenTeams()
+
     Dim x As Integer, y As Integer
 '    x = MousePos.X_Pos
 '    y = MousePos.Y_Pos
@@ -62,17 +64,21 @@ Sub RecurOpenTeams()
     Else
         Call OpenTeams
     End If
-    x = CInt(Rnd() * 1000)
-    y = CInt(Rnd() * 500)
+    Do While x = 0 Or (x > 775 And x < 900)
+        x = CInt(Rnd() * 1000)
+    Loop
+    Do While y = 0 Or (y > 60 And y < 100)
+        y = CInt(Rnd() * 500)
+    Loop
     SetCursorPos x, y  'set mouse position -- random
     'Call MousePosClick(x, y)
     If Not IsNumLockOn Then ToggleNumLock
     Dim dTarget As Date
     If Hour(Now) > 5 And Hour(Now) < 7 And Minute(Now) > 35 Then 'prep for work
-        dTarget = Now + (1 / 24 / 60) * 15 '15 min
+        dTarget = Now + (1 / 24 / 60) * 5 '5 min
         Debug.Print "work prep"
     ElseIf Hour(Now) > 6 And Hour(Now) < 16 Then 'work-time
-        dTarget = Now + (1 / 24 / 60) * 10 '15 min
+        dTarget = Now + (1 / 24 / 60) * 15 '5 min
         Debug.Print "work time"
     ElseIf (Weekday(Date) = 6 And Hour(Now) > 15) Or Weekday(Date) = 7 Or Weekday(Date) = 1 Then 'late on Friday
         dTarget = Date - Weekday(Date) + vbMonday - 7 * (vbMonday <= Weekday(Date)) + TimeValue("06:45:00") '6:45 Monday morning
@@ -81,6 +87,9 @@ Sub RecurOpenTeams()
         dTarget = Date + 1 + TimeValue("06:45:00") '6:45 next morning
         Call MousePosClick(x, y)
         Debug.Print "elif"
+    ElseIf Hour(Now) > 0 And Hour(Now) < 6 Then
+        dTarget = Date + TimeValue("06:45:00")
+        Debug.Print "early morning"
     Else
         Debug.Print "ELSE -- " & Format(Now, "HH:MM:SS")
     End If
@@ -91,17 +100,26 @@ End Sub
 Sub OpenTeams()
     On Error GoTo errhandler
     Dim sPath As String, iX As Integer, iY As Integer, sActive As String
-    sActive = ActiveWindowTitle
+    sApp = ActiveWindowTitle
+'    Do While iX = 0 Or (iX > 775 And iX < 900)
+'        iX = iX + 10 * Rnd()
+'    Loop
+'    Do While iY = 0 Or (iY > 60 And iY < 100)
+'        iY = iY + 10 * Rnd()
+'    Loop
     iX = 75
     iY = 25
-    iX = iX + 10 * Rnd()
-    iY = iY + 10 * Rnd()
     sPath = "C:\Users\englandt\AppData\Local\Microsoft\Teams\Update.exe --processStart " & """" & "Teams.exe" & """"
     Call Shell(sPath, vbNormalFocus)
-    Application.Wait 1000
+    Debug.Print "---"
     Call MousePosClick(iX, iY) '1000 px from left, 50 px from top
+    iX = 20
+    iY = 840
+    Call MousePosClick(iX, iY) 'notepad/desktop
     SendKeys " "
-    AppActivate sActive
+    SendKeys "{DOWN}"
+    'AppActivate sApp
+    
 errhandler:
 End Sub
 
