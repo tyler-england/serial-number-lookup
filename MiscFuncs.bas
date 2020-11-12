@@ -1,6 +1,7 @@
 Attribute VB_Name = "MiscFuncs"
 Option Explicit
 
+
 Public Function Testlink(link As String) As Boolean
 'tests online/sharepoint link
 Dim RequestSharepoint As New WinHttpRequest
