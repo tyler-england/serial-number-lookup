@@ -902,8 +902,8 @@ End Function
 Function SearchPhoneList(sInput As String, sType As String, wbPhone As Workbook) As String()
     
     Dim sOutput(3) As String '(0)=Name, (1)=Ext, (2)=Number, (3)=Cell
-    Dim x As Integer
-    Dim bConfRng As Boolean
+    Dim x As Integer, iNameOffset As Integer
+    Dim bConfRng As Boolean, bRevSearch As Boolean
     Dim rngConfRms() As Range, rngResult As Range, rngStart As Range, rngEnd As Range 'ranges with conf room extensions
     Dim varVar As Variant
     Dim rngIsect As Range, arrRngs() As Range
@@ -946,15 +946,16 @@ Function SearchPhoneList(sInput As String, sType As String, wbPhone As Workbook)
         For Each varVar In rngConfRms 'varvar = range with conf rooms
             On Error Resume Next 'in case "Find" fails
             Set rngResult = varVar.Find(what:=sInput, lookat:=xlPart)
-            If Not rngResult Is Nothing Then
+            If Not rngResult Is Nothing Then 'inameoffset=0
                 sOutput(0) = rngResult.Value
-                sOutput(1) = rngResult.Offset(0, 1).Value
-                sOutput(2) = rngResult.Offset(0, 2).Value
-                sOutput(3) = rngResult.Offset(0, 3).Value
+                sOutput(1) = rngResult.Offset(0, iNameOffset + 1).Value
+                sOutput(2) = rngResult.Offset(0, iNameOffset + 2).Value
+                sOutput(3) = rngResult.Offset(0, iNameOffset + 3).Value
                 Exit For
             End If
         Next
     Else 'person or other non-conference room
+        If IsNumeric(sInput) Then bRevSearch = True
         For Each Sheet In wbPhone.Sheets
             x = 0 'for array of ranges which have been found
             On Error Resume Next 'in case "Find" fails
@@ -968,12 +969,28 @@ Function SearchPhoneList(sInput As String, sType As String, wbPhone As Workbook)
                     End If
                 Next
                 If Not bConfRng Then 'not part of any conf rm ranges
-                    sOutput(0) = rngResult.Value
-                    sOutput(1) = rngResult.Offset(0, 1).Value
-                    If InStr(rngResult.Offset(0, 2).Value, ",") = 0 Then 'not a person's name in the next column
-                        sOutput(2) = rngResult.Offset(0, 2).Value
-                        If InStr(rngResult.Offset(0, 3).Value, ",") = 0 Then
-                            sOutput(3) = rngResult.Offset(0, 3).Value
+                    If bRevSearch Then
+                        If rngResult.Value = sInput Then 'extension was found
+                            iNameOffset = -1
+                        Else 'phone # was found
+                            iNameOffset = -2
+                        End If
+                        sOutput(0) = rngResult.Offset(0, iNameOffset).Value
+                        sOutput(1) = rngResult.Offset(0, iNameOffset + 1).Value
+                        If InStr(rngResult.Offset(0, iNameOffset + 2).Value, ",") = 0 Then 'not a person's name in the next column
+                            sOutput(2) = rngResult.Offset(0, iNameOffset + 2).Value
+                            If InStr(rngResult.Offset(0, iNameOffset + 3).Value, ",") = 0 Then
+                                sOutput(3) = rngResult.Offset(0, iNameOffset + 3).Value
+                            End If
+                        End If
+                    Else
+                        sOutput(0) = rngResult.Value
+                        sOutput(1) = rngResult.Offset(0, 1).Value
+                        If InStr(rngResult.Offset(0, 2).Value, ",") = 0 Then 'not a person's name in the next column
+                            sOutput(2) = rngResult.Offset(0, 2).Value
+                            If InStr(rngResult.Offset(0, 3).Value, ",") = 0 Then
+                                sOutput(3) = rngResult.Offset(0, 3).Value
+                            End If
                         End If
                     End If
                 End If

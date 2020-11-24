@@ -24,7 +24,7 @@ Private Declare PtrSafe Function GetKeyboardState Lib "user32" _
 
 Private Declare PtrSafe Function SetKeyboardState Lib "user32" _
  (lppbKeyState As Byte) As Long
- 
+
 Const VK_NUMLOCK = &H90
 Const KEYEVENTF_EXTENDEDKEY = &H1
 Const KEYEVENTF_KEYUP = &H2
@@ -75,10 +75,10 @@ Sub RecurOpenTeams()
     If Not IsNumLockOn Then ToggleNumLock
     Dim dTarget As Date
     If Hour(Now) > 5 And Hour(Now) < 7 And Minute(Now) > 35 Then 'prep for work
-        dTarget = Now + (1 / 24 / 60) * 5 '5 min
+        dTarget = Now + (1 / 24 / 60) * 15 '5 min
         Debug.Print "work prep"
     ElseIf Hour(Now) > 6 And Hour(Now) < 16 Then 'work-time
-        dTarget = Now + (1 / 24 / 60) * 15 '5 min
+        dTarget = Now + (1 / 24 / 60) * 5 '5 min
         Debug.Print "work time"
     ElseIf (Weekday(Date) = 6 And Hour(Now) > 15) Or Weekday(Date) = 7 Or Weekday(Date) = 1 Then 'late on Friday
         dTarget = Date - Weekday(Date) + vbMonday - 7 * (vbMonday <= Weekday(Date)) + TimeValue("06:45:00") '6:45 Monday morning
