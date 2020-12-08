@@ -76,24 +76,19 @@ Sub RecurOpenTeams()
     Dim dTarget As Date
     If Hour(Now) > 5 And Hour(Now) < 7 And Minute(Now) > 35 Then 'prep for work
         dTarget = Now + (1 / 24 / 60) * 15 '5 min
-        Debug.Print "work prep"
     ElseIf Hour(Now) > 6 And Hour(Now) < 16 Then 'work-time
         dTarget = Now + (1 / 24 / 60) * 5 '5 min
-        Debug.Print "work time"
     ElseIf (Weekday(Date) = 6 And Hour(Now) > 15) Or Weekday(Date) = 7 Or Weekday(Date) = 1 Then 'late on Friday
         dTarget = Date - Weekday(Date) + vbMonday - 7 * (vbMonday <= Weekday(Date)) + TimeValue("06:45:00") '6:45 Monday morning
-        Debug.Print "late Fri"
     ElseIf Hour(Now) > 15 Then 'late on M-R
         dTarget = Date + 1 + TimeValue("06:45:00") '6:45 next morning
         Call MousePosClick(x, y)
-        Debug.Print "elif"
     ElseIf Hour(Now) > 0 And Hour(Now) < 6 Then
         dTarget = Date + TimeValue("06:45:00")
-        Debug.Print "early morning"
     Else
         Debug.Print "ELSE -- " & Format(Now, "HH:MM:SS")
     End If
-    Debug.Print "Teams to open at: " & Format(dTarget, "MMM DD, HH:MM:SS")
+    Debug.Print "Open at: " & Format(dTarget, "MMM DD, HH:MM:SS")
     Application.OnTime dTarget, "RecurOpenTeams"
 End Sub
 
