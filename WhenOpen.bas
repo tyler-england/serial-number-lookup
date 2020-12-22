@@ -77,7 +77,11 @@ Sub RecurOpenTeams()
     If Hour(Now) > 5 And Hour(Now) < 7 And Minute(Now) > 35 Then 'prep for work
         dTarget = Now + (1 / 24 / 60) * 15 '5 min
     ElseIf Hour(Now) > 6 And Hour(Now) < 16 Then 'work-time
-        dTarget = Now + (1 / 24 / 60) * 5 '5 min
+        If Right(Minute(Now)) = 1 Then
+            dTarget = Now + (1 / 24 / 60) * 4 '4 min
+        Else
+            dTarget = Now + (1 / 24 / 60) * 5 '5 min
+        End If
     ElseIf (Weekday(Date) = 6 And Hour(Now) > 15) Or Weekday(Date) = 7 Or Weekday(Date) = 1 Then 'late on Friday
         dTarget = Date - Weekday(Date) + vbMonday - 7 * (vbMonday <= Weekday(Date)) + TimeValue("06:45:00") '6:45 Monday morning
     ElseIf Hour(Now) > 15 Then 'late on M-R

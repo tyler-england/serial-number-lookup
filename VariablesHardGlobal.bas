@@ -13,6 +13,32 @@ Public rngMatSN As Range, rngMatPM1 As Range, rngMatPM2 As Range, rngMatPM3 As R
 Public rngCarrSN As Range, rngCentSN As Range, rngBurtSN As Range
 Public sProdLine As String
 
+Sub sptests()
+    'Works but paths are listed as URLs
+    Dim wb As Workbook
+    Set wb = Workbooks.Open("https://bw1.sharepoint.com/:x:/r/sites/PSA/PSAENG/PSAGDI/Engineering%20Work%20Sheet%20EWS/EWS300000%20to%20EWS399999/EWS300000/EWS300000/EWS300000.xls")
+    
+    
+'    'doesn't work
+'    Dim folder As folder
+'    Dim f As File
+'    Dim fs As New FileSystemObject
+'    Dim wb As Workbook
+'
+'    Set folder = fs.GetFolder("//bw1.sharepoint.com/sites/PSA/PSApjm/SitePages/Home.aspx")
+'
+'    For Each f In folder.Files
+'       If f.Name Like "*" Then
+'           Debug.Print f.Name
+'       End If
+'    Next f
+
+
+'    'try if login gets complicated
+'    'try FollowHyperlink
+
+End Sub
+
 Sub GlobalVariables()
     On Error Resume Next
     '''''''''''''''''''''hardcoded values''''''''''''''''

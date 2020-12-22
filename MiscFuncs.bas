@@ -127,8 +127,8 @@ End Function
 Function FindFullPath(sPath As String, sFileName As String, sExtPatt As String, Optional bFolder As Boolean) As String
 
     Dim FSO As New FileSystemObject
-    Dim myFolder As Scripting.Folder
-    Dim mySubFolder As Scripting.Folder
+    Dim myFolder As Scripting.folder
+    Dim mySubFolder As Scripting.folder
     Dim myFile As Scripting.File
     Dim sOut As String
     On Error GoTo errhandler
@@ -147,7 +147,7 @@ Function FindFullPath(sPath As String, sFileName As String, sExtPatt As String, 
         Next
     Else
         For Each mySubFolder In myFolder.SubFolders
-            For Each myFile In mySubFolder.files
+            For Each myFile In mySubFolder.Files
                 'If sOut <> "" Then Exit For
                 If UCase(myFile.Name) Like UCase("*" & sFileName & "*" & sExtPatt) Then
                     sOut = myFile.Path 'Or do whatever you want with the file
@@ -159,6 +159,7 @@ Function FindFullPath(sPath As String, sFileName As String, sExtPatt As String, 
         Next
     End If
     FindFullPath = sOut
+    Exit Function
 errhandler:
     Call ErrorRep("FindFullPath", "Function", sOut, Err.Number, Err.Description, "")
 End Function
@@ -166,8 +167,8 @@ End Function
 Function FindFullPathz(sUmbPath As String, sFileName As String, sExtPat As String) As String
 'gets file path for file name
     Dim oFSO As Object
-    Dim myFolder As Scripting.Folder
-    Dim mySubFolder As Scripting.Folder
+    Dim myFolder As Scripting.folder
+    Dim mySubFolder As Scripting.folder
     Dim myFile As Scripting.File
     Dim sOut As String
     
@@ -177,7 +178,7 @@ Function FindFullPathz(sUmbPath As String, sFileName As String, sExtPat As Strin
     If Left(sExtPat, 1) <> "." Then sExtPat = "." & sExtPat
     
     For Each mySubFolder In myFolder.SubFolders
-        For Each myFile In mySubFolder.files
+        For Each myFile In mySubFolder.Files
             If UCase(myFile.Name) Like UCase("*" & sFileName & "*" & sExtPat) Then
                 Debug.Print "path:" & myFile.Path
                 sOut = myFile.Path
@@ -385,9 +386,9 @@ errhandler:
 End Function
 
 Function MapSharepoint(sSharePointLink As String) As String
-    
-'maps sharepoint to a drive, letting user bypass the need for credentials
-    Dim sDriveLet As String, i As Integer, iStage As Integer
+'maps sharepoint to a drive, letting user bypass the need for credentials on desktop
+
+    Dim sDriveLet As String, i As Integer, j As Integer, iStage As Integer
     Dim oMappedDrive As Scripting.drive
     Dim oFSO As New Scripting.FileSystemObject
     Dim oNetwork As New WshNetwork
@@ -396,7 +397,7 @@ Function MapSharepoint(sSharePointLink As String) As String
     Dim varVar As Variant, arrMappedPaths As Variant
     Dim bIeOpen As Boolean, bMapped As Boolean, sTest As String
     
-    On Error GoTo errhandler
+    'On Error GoTo errhandler
     iStage = 0
     Call GlobalVariables
     
@@ -415,7 +416,7 @@ Function MapSharepoint(sSharePointLink As String) As String
             bMapped = False
         End If
     End If
-    MsgBox bMapped
+
     If Not bMapped Then 'need to map to a drive letter
         bIeOpen = False
         Set oShell = CreateObject("Shell.Application").Windows()
@@ -429,35 +430,42 @@ Function MapSharepoint(sSharePointLink As String) As String
         If oIE Is Nothing Then Set oIE = CreateObject("InternetExplorer.Application")
         Application.ScreenUpdating = True
         oIE.Visible = True
-        If bIeOpen Then
-            oIE.Navigate sSharePointLink, CLng(2048) 'new tab
-        Else
-            oIE.Navigate sSharePointLink 'no new tab
-        End If
-        'Application.Wait (60000)
-        iStage = 2
-        If Right(sSharePointMap, 1) <> "\" Then sSharePointMap = sSharePointMap & "\"
-        MsgBox "1"
-        sTest = Dir(sSharePointMap, vbDirectory) 'throws error if still not working
-        MsgBox "2"
-        For i = Asc("Z") To Asc("A") Step -1
-            sDriveLet = Chr(i)
-            MsgBox Chr(i)
-            If Not oFSO.DriveExists(sDriveLet) Then
-                Application.DisplayAlerts = True
-                Application.ScreenUpdating = True
-                oNetwork.MapNetworkDrive sDriveLet & ":", sSharePointMap
-                Exit For
+        
+        Do While j < 5 And Not bMapped
+        
+            If bIeOpen Then
+                oIE.Navigate sSharePointLink, CLng(2048) 'new tab
+            Else
+                oIE.Navigate sSharePointLink 'no new tab
             End If
-        Next
+            
+           ' Application.Wait (Now + TimeValue("0:00:10")) 'necessary?
+            
+            For i = Asc("Z") To Asc("A") Step -1
+                sDriveLet = Chr(i)
+                If Not oFSO.DriveExists(sDriveLet) Then
+                    Application.DisplayAlerts = True
+                    Application.ScreenUpdating = True
+                    oNetwork.MapNetworkDrive sDriveLet & ":", sSharePointMap
+                    bMapped = True
+                    Exit For
+                End If
+            Next
+
+            For Each oWinTest In oShell 'close ssharepointmap explorer window
+                If InStr(oWinTest.LocationURL, "sharepoint.com") Then oWinTest.Quit 'a bit broad but probably fine
+            Next
+            
+            Debug.Print "map: " & bMapped & " (" & sDriveLet & ")"
+            Debug.Print "access: " & SharePointAccess
+            
+            If Not SharePointAccess Then bMapped = False 'retry :(
+            j = j + 1
+            
+        Loop
+        
         iStage = 3
         If Not bIeOpen Then oIE.Quit
-'        For Each oWinTest In oShell 'close ssharepointmap explorer window
-'            If InStr(oWinTest.LocationURL, "sharepoint.com") Then 'a bit broad but probably fine
-'                oWinTest.Quit
-'                Exit For
-'            End If
-'        Next
         iStage = 4
     End If
     

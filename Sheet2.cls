@@ -12,7 +12,7 @@ Private Sub Worksheet_Activate()
     Call GlobalVariables
     
     If Not SharePointAccess Then
-        
+        Call MapSharepoint(sSharePointLink)
     End If
         
     If Not bLinksUpdated Then
@@ -20,10 +20,6 @@ Private Sub Worksheet_Activate()
         Application.ScreenUpdating = False
         
         Dim sSpDriveLet As String
-        'If Not sharepointaccess Then
-            sSpDriveLet = MapSharepoint(sSharePointLink) 'req'd to avoid opening IE for sharepoint login
-            If sSpDriveLet = "" Then Exit Sub
-        'End If
         
         Dim rngEwsList As Range, rngEwsArchive As Range, rngBOMLoader As Range
         Dim rngBurtLog As Range, rngBurtAM As Range
@@ -45,7 +41,7 @@ Private Sub Worksheet_Activate()
         Set rngCarrAM = rngCentLog.Offset(1, 0)
         Set rngMatPM = rngMatLog.Offset(1, 0)
         Set rngPhoneCLW = rngPhoneAKR.Offset(1, 0)
-        Debug.Print "inside"
+        
         Call FillLink(rngEwsList, sEWSListFolder, "Online EWS List", "Folder")
         Call FillLink(rngEwsArchive, sEWSArchFolder, "EWS Archive", "Folder")
         Call FillLink(rngBOMLoader, FindMostCurrent(sBOMLoaderFolder), "BOM Loader")
@@ -60,8 +56,8 @@ Private Sub Worksheet_Activate()
         Call FillLink(rngPhoneAKR, sPhonePathAKR, "Akron/Stow Ext's")
         
         If sSpDriveLet <> "" Then
-            'Call UnmapSharepoint(sSpDriveLet) 'unmap the sharepoint drive
-            'sSpDriveLet = "" 'clear so we don't try unmapping again
+            Call UnmapSharepoint(sSpDriveLet) 'unmap the sharepoint drive
+            sSpDriveLet = "" 'clear so we don't try unmapping again
         End If
         
         bLinksUpdated = True
