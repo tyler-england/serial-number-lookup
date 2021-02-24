@@ -56,9 +56,10 @@ End Type
 
 Sub RecurOpenTeams()
 
-    Dim x As Integer, y As Integer
+    Dim x As Integer, y As Integer, bPT As Boolean
 '    x = MousePos.X_Pos
 '    y = MousePos.Y_Pos
+    bPT = True
     If Hour(Now) > 15 Then
         Call MousePosClick(2000, 10)
     Else
@@ -76,11 +77,15 @@ Sub RecurOpenTeams()
     Dim dTarget As Date
     If Hour(Now) > 5 And Hour(Now) < 7 And Minute(Now) > 35 Then 'prep for work
         dTarget = Now + (1 / 24 / 60) * 15 '5 min
-    ElseIf Hour(Now) > 6 And Hour(Now) < 16 Then 'work-time
-        If Right(Minute(Now), 1) = 1 Then
-            dTarget = Now + (1 / 24 / 60) * 4 '4 min
-        Else
-            dTarget = Now + (1 / 24 / 60) * 5 '5 min
+    ElseIf Hour(Now) > 6 And Hour(Now) < 16 And Weekday(Date) > 1 And Weekday(Date) < 7 Then 'work-time
+        If bPT And Weekday(Date) Mod 2 <> 0 Then
+            dTarget = Date + 1 + TimeValue("06:45:00")
+        Else 'all days
+            If Right(Minute(Now), 1) = 1 Then
+                dTarget = Now + (1 / 24 / 60) * 4 '4 min
+            Else
+                dTarget = Now + (1 / 24 / 60) * 5 '5 min
+            End If
         End If
     ElseIf (Weekday(Date) = 6 And Hour(Now) > 15) Or Weekday(Date) = 7 Or Weekday(Date) = 1 Then 'late on Friday
         dTarget = Date - Weekday(Date) + vbMonday - 7 * (vbMonday <= Weekday(Date)) + TimeValue("06:45:00") '6:45 Monday morning
@@ -171,3 +176,57 @@ Function ActiveWindowTitle() As String
     ActiveWindowTitle = sWinText
 End Function
 
+Sub UpdateDocTracker()
+    
+    Dim wB As Workbook, sTrackerPath As String
+    Dim i As Integer, iEmpty As Integer
+    Dim oOutlook As Object, oMail As Object
+    
+    If Weekday(Date) > 1 And Weekday(Date) < 7 And Time < TimeValue("05:00:00") Then
+        sTrackerPath = "https://bw1-my.sharepoint.com/personal/tyler_england_bwpackagingsystems_com/Documents/Distributed%20Files/Doc%20Tracker.xlsm"
+        Set wB = Workbooks.Open(sTrackerPath) 'open doc tracker
+        wB.Activate
+        wB.Worksheets(1).Activate
+        i = 3
+    
+        Do While iEmpty < 10 'update all
+            Debug.Print wB.Worksheets(1).Cells(2, i).Value
+            If wB.Worksheets(1).Cells(2, i).Value > 0 Then
+                iEmpty = 0
+                wB.Worksheets(1).Cells(2, i).Select
+                Application.Run "'Doc Tracker.xlsm'!UpdateSelected"
+                Debug.Print "Updated " & wB.Worksheets(1).Cells(2, i).Value
+            Else
+                iEmpty = iEmpty + 1
+            End If
+            i = i + 1
+        Loop
+        
+        wB.Save
+        wB.Close 'savechanges:=False
+    
+        Set oOutlook = CreateObject("Outlook.Application") 'email Kim & Pam & John
+        oOutlook.Session.Logon
+        Set oMail = oOutlook.CreateItem(olMailItem)
+        With oMail
+            .Recipients.Add "Kim.Paolozzi@bwpackagingsystems.com"
+            .Recipients.Add "Pam.Power@bwpackagingsystems.com"
+            .Recipients.Add "John.Shaw@bwpackagingsystems.com"
+            .Subject = "Doc Tracker Updated"
+            .Body = "Hi all," & vbCrLf & vbCrLf & "The doc tracker has just been updated. (This is an automated email)" & vbCrLf & vbCrLf & "Best," & vbCrLf & "Tyler"
+        End With
+        oMail.Send
+        Debug.Print "email sent at " & Format(Now, "MMM DD, HH:MM:SS")
+    End If
+    
+    Dim dTarget As Date
+    If Weekday(Date) < 6 Then 'Sun - Thurs
+        dTarget = Date + 1 + TimeValue("03:30:00")
+    ElseIf Weekday(Date) = 6 Then 'Fri
+        dTarget = Date + 3 + TimeValue("03:30:00")
+    Else 'Sat
+        dTarget = Date + 2 + TimeValue("03:30:00")
+    End If
+    Debug.Print "Doc Tracker at: " & Format(dTarget, "MMM DD, HH:MM:SS")
+    Application.OnTime dTarget, "UpdateDocTracker"
+End Sub

@@ -15,8 +15,8 @@ Public sProdLine As String
 
 Sub sptests()
     'Works but paths are listed as URLs
-    Dim wb As Workbook
-    Set wb = Workbooks.Open("https://bw1.sharepoint.com/:x:/r/sites/PSA/PSAENG/PSAGDI/Engineering%20Work%20Sheet%20EWS/EWS300000%20to%20EWS399999/EWS300000/EWS300000/EWS300000.xls")
+    Dim wB As Workbook
+    Set wB = Workbooks.Open("https://bw1.sharepoint.com/:x:/r/sites/PSA/PSAENG/PSAGDI/Engineering%20Work%20Sheet%20EWS/EWS300000%20to%20EWS399999/EWS300000/EWS300000/EWS300000.xls")
     
     
 '    'doesn't work

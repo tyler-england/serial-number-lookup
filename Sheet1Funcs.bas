@@ -673,7 +673,7 @@ Function CheckFastLinks() As Boolean()
 errhandler:
 End Function
 
-Function RetrieveInfo(wb As Workbook, iSheetInd As String, sLookupVal As String, sLookupCol As String, sColSN As String, _
+Function RetrieveInfo(wB As Workbook, iSheetInd As String, sLookupVal As String, sLookupCol As String, sColSN As String, _
                          sColCO As String, sColDate As String, sColCust As String, sColModel As String, bFindLatest As Boolean) As String()
 'returns details for a job from a workbook, going by earliest or latest CO in the sheet
 '(0)=SN, (1)=CO, (2)=Date, (3)=Customer, (4)=Model
@@ -695,7 +695,7 @@ Function RetrieveInfo(wb As Workbook, iSheetInd As String, sLookupVal As String,
     ReDim arrRngs(0)
     If IsNumeric(iSheetInd) Then 'only lookup for 1 sheet
         i = CInt(iSheetInd)
-        Set wSheet = wb.Worksheets(i)
+        Set wSheet = wB.Worksheets(i)
         On Error Resume Next
             Set rngResult = wSheet.Range(sLookupCol & ":" & sLookupCol).Find(what:=sLookupVal)
         On Error GoTo 0 'errhandler
@@ -739,7 +739,7 @@ Function RetrieveInfo(wb As Workbook, iSheetInd As String, sLookupVal As String,
             If x > 500 Then Exit Do 'something bad
         Loop
     Else 'lookup on all sheets
-        For Each varSheet In wb.Worksheets
+        For Each varSheet In wB.Worksheets
             On Error Resume Next
                 Set rngResult = varSheet.Range(sLookupCol & ":" & sLookupCol).Find(what:=sLookupVal)
             On Error GoTo 0 'errhandler
