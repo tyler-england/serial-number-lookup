@@ -13,8 +13,8 @@ End Sub
 
 
 Private Sub Workbook_Open()
-    ThisWorkbook.AutoSaveOn = False
     On Error Resume Next
+    ThisWorkbook.AutoSaveOn = False
     Application.DisplayAlerts = False
     Sheet1.Visible = xlSheetVisible
     Dim i As Integer, j As Integer

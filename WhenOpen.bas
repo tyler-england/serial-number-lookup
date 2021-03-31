@@ -1,5 +1,5 @@
 Attribute VB_Name = "WhenOpen"
-Public sApp As String
+Public sApp As String, bRT As Boolean
 Option Explicit
 
 '''''for NumLock'''''''
@@ -55,11 +55,24 @@ Type POINTAPI
 End Type
 
 Sub RecurOpenTeams()
-
+    Dim bExit As Boolean
+    
+    '''''''''''''' True = stop ''''''
+    bExit = True
+    '''''''''''''''''''''''''''''''''
+    
+    If bExit Then
+        bRT = False
+        Exit Sub
+    ElseIf bRT Then
+        Debug.Print "Already running"
+        Exit Sub
+    End If
+    
     Dim x As Integer, y As Integer, bPT As Boolean
-'    x = MousePos.X_Pos
-'    y = MousePos.Y_Pos
-    bPT = True
+
+    bPT = True 'True when part-time
+    
     If Hour(Now) > 15 Then
         Call MousePosClick(2000, 10)
     Else
@@ -99,8 +112,12 @@ Sub RecurOpenTeams()
     End If
     Debug.Print "Open at: " & Format(dTarget, "MMM DD, HH:MM:SS")
     Application.OnTime dTarget, "RecurOpenTeams"
+    bRT = True
+    Application.OnTime dTarget - TimeValue("00:00:10"), "reset"
 End Sub
-
+Sub reset()
+    bRT = False
+End Sub
 Sub OpenTeams()
     On Error GoTo errhandler
     Dim sPath As String, iX As Integer, iY As Integer, sActive As String
@@ -188,7 +205,7 @@ Sub UpdateDocTracker()
         wB.Activate
         wB.Worksheets(1).Activate
         i = 3
-    
+        
         Do While iEmpty < 10 'update all
             Debug.Print wB.Worksheets(1).Cells(2, i).Value
             If wB.Worksheets(1).Cells(2, i).Value > 0 Then

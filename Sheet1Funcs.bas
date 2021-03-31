@@ -582,13 +582,13 @@ Function FindEWSPath(sCO As String, rngSN As Range, sProdLine As String, bLinks 
     Application.StatusBar = Left(Application.StatusBar, InStrRev(Application.StatusBar, ".")) & " (Vault)"
     ''''''''hardcoded'''''''''''''''''
     If UCase(sProdLine) = "CARR" Then
-        sPath = "C:\EPDM\PSA_Vault\CLW\CARR\C" & Left(rngSN.Value, 2) & "\"
+        sPath = "C:\PSA_Vault\CLW\CARR\C" & Left(rngSN.Value, 2) & "\"
         sFilePatt = "*" & Replace(rngSN.Value, "-", "") & "*EWS*.xls*"
     Else
         If UCase(sProdLine) = "BURT" Then
             sPath = "\\PSACLW02\RELEASED\MB SOP\EWS (ENGR WORK SHEET)\EWS200000\EWS" & CStr(Int((sCO / 1000)) * 1000) & "\"
         Else
-            sPath = "C:\EPDM\PSA_Vault\CLW\Mateer\EWS\EWS" & CStr(Int((sCO / 1000)) * 1000) & "\"
+            sPath = "C:\PSA_Vault\CLW\Mateer\EWS\EWS" & CStr(Int((sCO / 1000)) * 1000) & "\"
         End If
         sFilePatt = "EWS" & sCO & "*.xls*"
     End If
