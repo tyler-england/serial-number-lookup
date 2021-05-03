@@ -80,7 +80,7 @@ Public Function GetLatest(sFilePath As String) As String
 
     On Error GoTo errhandler
     
-    If InStr(UCase(sFilePath), "EPDM") = 0 Then
+    If InStr(UCase(sFilePath), "PSA_VAULT") = 0 Then
         GetLatest = sFilePath
         Exit Function
     End If
@@ -93,14 +93,19 @@ Public Function GetLatest(sFilePath As String) As String
     End If
     
     Set eFile = eVault.GetFileFromPath(sFilePath)
-    
-    If eFile.CurrentVersion = eFile.GetLocalVersionNo(sFilePath) Then 'no GetLatest required
+    Debug.Print eFile.GetLocalVersionNo(sFilePath)
+    i = eFile.GetLocalVersionNo(sFilePath)
+    If eFile.CurrentVersion = i Then 'no GetLatest required
         GetLatest = sFilePath
         Exit Function
     Else 'check if user wants to overwrite
-        vbAns = MsgBox("You don't have the latest version of the following file..." & vbCrLf & vbCrLf & _
-                    Right(sFilePath, Len(sFilePath) - InStrRev(sFilePath, "\")) & vbCrLf & vbCrLf & _
-                    "Do you want to get the latest version & overwrite the one on your local disk?", vbYesNo)
+        If i < 0 Then 'no file at all --> get from Vault
+            vbAns = vbYes
+        Else
+            vbAns = MsgBox("You don't have the latest version of the following file..." & vbCrLf & vbCrLf & _
+                        Right(sFilePath, Len(sFilePath) - InStrRev(sFilePath, "\")) & vbCrLf & vbCrLf & _
+                        "Do you want to get the latest version & overwrite the one on your local disk?", vbYesNo)
+        End If
         If vbAns = vbNo Then 'abandon the GetLatest
             GetLatest = sFilePath
             Exit Function
